@@ -47,10 +47,11 @@
        document.getElementsByTagName('*')
     
     3. Paste this into your browser's address bar:
-       http://localhost:9081/xss-attack?xssvalue=HelloWorld
+       https://localhost:8443/xss-attack?xssvalue=HelloWorld
     
     
-    4. Paste this into your browser's debug console:
+    4. Paste this into your browser's debug console
+       (inner is the content, outer is the element tag + content):
        document.getElementsByTagName('*')
        document.body
        document.getElementsByTagName('pre')[0].innerHTML
@@ -60,7 +61,7 @@
     
     
     6. Paste this into your browser's address bar:
-       http://localhost:9081/xss-attack?xssvalue=<script>alert("XSS attack 1")</script>
+       https://localhost:8443/xss-attack?xssvalue=<script>alert("XSS attack 1")</script>
     
     7. Paste this into your browser's debug console:
         document.getElementsByTagName('*')
@@ -90,7 +91,7 @@
     
     12. Paste this into your browser's address bar:
     
-    http://localhost:9081/xss-attack?xssvalue=' <script>  alert('XSS attack 2') </script>'
+    https://localhost:8443/xss-attack?xssvalue=' <script>  alert('XSS attack 2') </script>'
     
     13. In the console, see how the code above is stored as text in the DOM:
     
@@ -315,7 +316,7 @@
             </div>
 
             <div class="form-container-split">
-                <h2>XSSP - CSP Protection Enforcement Form</h2>
+                <h2>XSS - CSP Protection Enforcement Form</h2>
                 <form id="configForm" enctype="text/plain">
                 <label for="configInput">Enter Config:</label>
                 <textarea

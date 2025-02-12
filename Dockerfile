@@ -43,14 +43,12 @@ RUN bash -c ' \
     for CONFIG_FILE in "${CONFIG_FILES[@]}"; do \
         echo "echo \"\" > ${CONFIG_FILE}; chmod a+rw ${CONFIG_FILE}" >> /docker-entrypoint.d/10-clear-csp-policy.sh; \
     done; \
-    chmod a+x /docker-entrypoint.d/10-clear-csp-policy.sh \
-'
+    chmod a+x /docker-entrypoint.d/10-clear-csp-policy.sh; \
+    # start a cron job to reload nginx every 5 seconds \
+    echo "while sleep 5; do /usr/local/openresty/nginx/sbin/nginx -s reload &> /tmp/ngxreload   ; done &" > /docker-entrypoint.d/50-start-cron.sh; \
+    chmod a+x /docker-entrypoint.d/50-start-cron.sh;    '
 
-     
-
-
-
-# copy front end static files to the web root
+    # copy front end static files to the web root
 COPY fe/ /usr/local/openresty/nginx/html/
 # install luafilesystem which allow LUA to make file
 # system calls like chdir, mode, default dir

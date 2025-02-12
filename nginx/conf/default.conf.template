@@ -22,11 +22,21 @@ http {
 
         ############  COMMON front end  configurations  ############
         #### Front End Serves up HTML pages and Updates NGINX configurations ####
-
     server {
-        listen       80;
+        listen 80;
+        server_name localhost;
+        return 301 https://$host:7443$request_uri;
+    }
+    server {
+
+        listen       443 ssl ;
+        ssl_protocols TLSv1.2 TLSv1.3;
         server_name  localhost;
         include /etc/nginx/conf.d/fe-html.conf;
+
+        ssl_certificate     /usr/local/openresty/nginx/publiccert.crt;
+        ssl_certificate_key /usr/local/openresty/nginx/privatekey.key;
+
 
         # redirect server error pages to the static page /50x.html
         #
@@ -38,8 +48,13 @@ http {
 
         ############   back end CSP configurations HTTP Server  ############
     server {
-        listen              8080; # listen both http and https
+        listen 8000;
+        server_name localhost;
+        return 301 https://$host:8443$request_uri;
+    }
+    server {
         listen              8443 ssl;
+        ssl_protocols TLSv1.2 TLSv1.3;
         server_name         localhost;
         include       mime.types;
 
@@ -58,8 +73,13 @@ http {
 
         ############   back end CORS configurations HTTP server ############
     server {
-        listen              9090; # listen both http and https
+        listen 9000;
+        server_name localhost;
+        return 301 https://$host:9443$request_uri;
+    }
+    server {
         listen              9443 ssl;
+        ssl_protocols TLSv1.2 TLSv1.3;
         server_name         localhost;
         include             mime.types;
         root                /usr/local/openresty/nginx/html/;

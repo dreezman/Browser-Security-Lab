@@ -1,13 +1,6 @@
 # backend api server written in LUA that simulates backend API endpoints
 
-        # default is hello world
-        location / {
-            default_type text/html;
-            content_by_lua_block {
-                dofile("${NGINX_CORS_CONFIG_FILE}")
-                ngx.say("<p>hello, world to default location</p>")
-            }
-        }
+
 
         # GET to return JSON data
         # default return a json string
@@ -21,57 +14,46 @@
                 dofile("${NGINX_CORS_CONFIG_FILE}")
                 local cjson = require "cjson"
                 ngx.status  = ngx.HTTP_OK
-                ngx.say(cjson.encode({ status = true, foobar = "string" }))
+                ngx.say(cjson.encode({ status = true, msg = "You have been HACKED!!!" }))
                 return ngx.exit(ngx.HTTP_OK)
             ';
         }
 
         # GET method returns an image
         # https://localhost/get-img?file=<filename>
+
+
+
+
         location /get-img {
+            root "/usr/local/openresty/nginx/html/";
             content_by_lua_block {
                 dofile("${NGINX_CORS_CONFIG_FILE}")
-                local args = ngx.req.get_uri_args()
-                local file = args["file"]
-                if file then
-                    local image_url = "/get-img-file/" .. file
-                    ngx.header["Content-Type"] = "text/html"
-                    ngx.say("<html><body><img src='" .. image_url .. "' alt='Image'></body></html>")
-        
+            -- Get the full request URI
+                local request_uri = ngx.var.request_uri
+
+                -- Extract the path after /get-img
+                local image_path = "cors/hackerimg.png" -- request_uri:match("(cors/.*.png)$")
+                print("Found Image path: " ..  image_path)
+                if image_path then
+                    local file_handle = io.open(image_path, "rb")
+                    if file_handle then
+                        local content = file_handle:read("*a")
+                        file_handle:close()
+                        ngx.header["Content-Type"] = "image/png"
+                        ngx.say(content)
+                    else
+                        ngx.status = ngx.HTTP_NOT_FOUND
+                        ngx.say("File " .. image_path .. " not found")
+                        return ngx.exit(ngx.HTTP_NOT_FOUND)
+                    end
                 else
                     ngx.status = ngx.HTTP_BAD_REQUEST
-                    ngx.say("File parameter is missing")
+                    ngx.say("File parameter is missing: " .. image_path)
                     return ngx.exit(ngx.HTTP_BAD_REQUEST)
                 end
+                }
             }
-
-        }
-
-        location /get-img-file {
-
-            alias "${NGINX_HTML_ROOT}";
-
-        }
-        # GET to return parms in GET x=1,y=2
-        # return HTML using content from request params...XSS vulnerable
-        location /echo-params {
-
-            default_type text/html;
-            content_by_lua_block {
-                dofile("${NGINX_CORS_CONFIG_FILE}")
-                local args = ngx.req.get_uri_args()
-                local response = "<html><body><h1>Request Parameters</h1><ul>"
-                for key, val in pairs(args) do
-                    if type(val) == "table" then
-                        response = response .. "<li>" .. key .. " : " .. table.concat(val, ", ") .. "</li>"
-                    else
-                        response = response .. "<li>" .. key .. " : " .. val .. "</li>"
-                    end
-                end
-                response = response .. "</ul></body></html>"
-                ngx.say(response)
-            }
-        }
 
 
         # POST login with PREFLIGHT

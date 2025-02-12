@@ -2,64 +2,60 @@
 
         # default is hello world
         location / {
+            include $NGINX_CSP_CONFIG_FILE;
             default_type text/html;
             content_by_lua_block {
                 ngx.header["Access-Control-Allow-Origin"] = '*'
                 ngx.say("<p>hello, world to default location</p>")
             }
         }
-        # default return a json string
-        location /json {
-            charset       utf-8;
-            charset_types application/json;
-            default_type  application/json;
-            content_by_lua '
-                ngx.header["Access-Control-Allow-Origin"] = "*"
-                local cjson = require "cjson"
-                ngx.status  = ngx.HTTP_OK
-                ngx.say(cjson.encode({ status = true, foobar = "string" }))
-                return ngx.exit(ngx.HTTP_OK)
-            ';
-        }
-
-        # return HTML using content from request params...XSS vulnerable
-        location /params {
-
-            default_type text/html;
-            content_by_lua_block {
-                ngx.header["Access-Control-Allow-Origin"] = "*"
-                local args = ngx.req.get_uri_args()
-                local response = "<html><body><h1>Request Parameters</h1><ul>"
-                for key, val in pairs(args) do
-                    if type(val) == "table" then
-                        response = response .. "<li>" .. key .. " : " .. table.concat(val, ", ") .. "</li>"
-                    else
-                        response = response .. "<li>" .. key .. " : " .. val .. "</li>"
-                    end
-                end
-                response = response .. "</ul></body></html>"
-                ngx.say(response)
-            }
-        }
+ 
         # return HTML using content from request params...also XSS vulnerable
-        #http://localhost:1234/attack?attack=%22%3Cscript%3Ealert(1)%3C/script%3E%22
+        #   https://localhost:8443/xss-attack?xssvalue='<script>  alert("XSS attack 2") </script>'
         location /xss-attack {
+            include $NGINX_CSP_CONFIG_FILE;
             content_by_lua_block {
                 ngx.header["Access-Control-Allow-Origin"] = "*"
                 local args = ngx.req.get_uri_args()
-                ngx.header.content_type = 'text/html'
-                local response = "<html><body>"
-
-                for key, val in pairs(args) do
-                    if key == "xss-value" then
-                       response = response ..  val 
-                    end
+                local xssvalue = args["xssvalue"]
+                -- Check if the value begins and ends with single or double quotes
+                -- see https://www.lua.org/manual/5.1/manual.html#5.4.1
+                -- Return HTML if NOT quoted, else return text
+                if not xssvalue:match("^['\"].+['\"]$") then
+                    -- return HTML because probably some script
+                    ngx.header["Content-Type"] = "text/html"
+                else
+                    -- quoted text
+                    ngx.header["Content-Type"] = "text/plain"
                 end
-
-                response = response .. "</body></html>"
-                ngx.say(response)
+                ngx.say(xssvalue)
             }
         }
+
+        # return HTML of the form
+        #   https://localhost:8443/xss-attack?xssvalue='<script>  alert("XSS attack 2") </script>'
+        location /xss-form {
+            include $NGINX_CSP_CONFIG_FILE;
+            content_by_lua_block {
+            ngx.header["Content-Type"] = "text/html"
+            ngx.header["Access-Control-Allow-Origin"] = "*"
+            -- Read the request body
+            ngx.req.read_body()
+            -- Retrieve the form parameters
+            local args = ngx.req.get_post_args()
+            -- Get the fname and lname parameters
+            local fname = args["fname"]
+            local lname = args["lname"]        
+            -- Create the response
+            local response = "<html><body><h1>Form Submission</h1><p>First Name: " .. fname .. "</p><p>Last Name: " .. lname .. "</p></body></html>"
+            
+            -- Send the response
+            ngx.say(response)
+    
+            }
+        }
+
+
 
         ############  Update CSP ngixn configuration dynamically  ############
         # allow browser client to update nginx config dynamically

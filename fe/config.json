@@ -1,18 +1,27 @@
 {
   "Iframes": [
     {
+      "apiName": "HTMLFrontend",
+      "domainName": "localhost",
+      "httpPort": "7000",
+      "httpsPort": "7443",
+      "fullHTTPURL": "http://localhost:7000",
+      "fullHTTPSURL": "https://localhost:7443",
+      "Description": "Front end for serving HTML and JS content"
+    },
+    {
       "apiName": "CSPbackend",
       "domainName": "localhost",
-      "httpPort": "9081",
-      "httpsPort": "9381",
-      "fullHTTPURL": "http://localhost:9081",
-      "fullHTTPSURL": "https://localhost:9381",
+      "httpPort": "8000",
+      "httpsPort": "8443",
+      "fullHTTPURL": "http://localhost:8000",
+      "fullHTTPSURL": "https://localhost:8443",
       "Description": "Backend endpoints for CSP lab"
     },
     {
       "apiName": "CORSbackend",
       "domainName": "localhost",
-      "httpPort": "9090",
+      "httpPort": "9000",
       "httpsPort": "9443",
       "fullHTTPURL": "http://localhost:9090",
       "fullHTTPSURL": "https://localhost:9443",
