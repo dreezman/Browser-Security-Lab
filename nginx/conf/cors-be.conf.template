@@ -1,14 +1,8 @@
 # backend api server written in LUA that simulates backend API endpoints
 
-        # default is hello world
-        location / {
-            default_type text/html;
-            content_by_lua_block {
-                ngx.header["Access-Control-Allow-Origin"] = '*'
-                ngx.say("<p>hello, world to default location</p>")
-            }
-        }
 
+
+        # GET to return JSON data
         # default return a json string
         location /json {
             charset       utf-8;
@@ -17,74 +11,124 @@
             content_by_lua '
                 -- include headers from the config file that the User
                 -- has dynamically updated
-                dofile("${NGINX_CONFIG_FILE}")
+                dofile("${NGINX_CORS_CONFIG_FILE}")
                 local cjson = require "cjson"
                 ngx.status  = ngx.HTTP_OK
-                ngx.say(cjson.encode({ status = true, foobar = "string" }))
+                ngx.say(cjson.encode({ status = true, msg = "You have been HACKED!!!" }))
                 return ngx.exit(ngx.HTTP_OK)
             ';
         }
 
         # GET method returns an image
         # https://localhost/get-img?file=<filename>
+
+
+
+
         location /get-img {
+            root "/usr/local/openresty/nginx/html/";
             content_by_lua_block {
-                ngx.header["Content-Type"] = "image/png"
-                local args = ngx.req.get_uri_args()
-                local file = args["file"]
-                if file then
-                    local image_url = "/get-img-file/" .. file
-                    ngx.header["Content-Type"] = "text/html"
-                    ngx.say("<html><body><img src='" .. image_url .. "' alt='Image'></body></html>")
-        
+                dofile("${NGINX_CORS_CONFIG_FILE}")
+            -- Get the full request URI
+                local request_uri = ngx.var.request_uri
+
+                -- Extract the path after /get-img
+                local image_path = "cors/hackerimg.png" -- request_uri:match("(cors/.*.png)$")
+                print("Found Image path: " ..  image_path)
+                if image_path then
+                    local file_handle = io.open(image_path, "rb")
+                    if file_handle then
+                        local content = file_handle:read("*a")
+                        file_handle:close()
+                        ngx.header["Content-Type"] = "image/png"
+                        ngx.say(content)
+                    else
+                        ngx.status = ngx.HTTP_NOT_FOUND
+                        ngx.say("File " .. image_path .. " not found")
+                        return ngx.exit(ngx.HTTP_NOT_FOUND)
+                    end
                 else
                     ngx.status = ngx.HTTP_BAD_REQUEST
-                    ngx.say("File parameter is missing")
+                    ngx.say("File parameter is missing: " .. image_path)
+                    return ngx.exit(ngx.HTTP_BAD_REQUEST)
+                end
+                }
+            }
+
+
+        # POST login with PREFLIGHT
+        # Return HTML with username and password logged in with
+        location /login {
+            content_by_lua_block {
+                local method = ngx.req.get_method()
+
+                if method == "OPTIONS" then
+                    dofile("${NGINX_PF_CORS_CONFIG_FILE}")
+                    return ngx.exit(ngx.HTTP_NO_CONTENT)  -- 204 No Content
+                elseif method == "POST" then
+                    ngx.req.read_body()
+                    local body_data = ngx.req.get_body_data()
+                    if not body_data then
+                        ngx.status = ngx.HTTP_BAD_REQUEST
+                        ngx.say("No body data")
+                        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+                    end
+
+                    local cjson = require "cjson"
+                    local ok, body = pcall(cjson.decode, body_data)
+                    if not ok then
+                        ngx.status = ngx.HTTP_BAD_REQUEST
+                        ngx.say("Invalid JSON")
+                        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+                    end
+
+                    local name = body.name
+                    local password = body.password
+
+                    if not name or not password then
+                        ngx.status = ngx.HTTP_BAD_REQUEST
+                        ngx.say("Missing name or password")
+                        return ngx.exit(ngx.HTTP_BAD_REQUEST)
+                    end
+
+                    -- Return HTML with the name and password (e.g., authenticate the user)
+                    ngx.log(ngx.STDERR, 'Login Successfull, adding header')
+                    dofile("${NGINX_CORS_CONFIG_FILE}")
+                    ngx.say("Login succesfull with Name: " .. name .. ", Password: " .. password)
+                else
+                    ngx.status = ngx.HTTP_BAD_REQUEST
+                    ngx.say("Unsupported request method")
                     return ngx.exit(ngx.HTTP_BAD_REQUEST)
                 end
             }
-
         }
 
-        location /get-img-file {
 
-            alias "${NGINX_HTML_ROOT}";
-
-        }
-        # GET to return parms
-        # return HTML using content from request params...XSS vulnerable
-        location /echo-params {
-
-            default_type text/html;
-            content_by_lua_block {
-
+        ############  Update CORS ngixn configuration dynamically  ############
+        # allow browser client to update nginx config dynamically
+        # cron has reload every 5 seconds to reload nginx config
+        # By default, write the default nginx config in file ${NGINX_CORS_CONFIG_FILE}
+        # If type parameter=preflight, then set the ${NGINX_PF_CORS_CONFIG_FILE}
+        # push-ngx-config?type=[common (default)|preflight]
+        location /push-ngx-config {
+            content_by_lua '
                 local args = ngx.req.get_uri_args()
-                local response = "<html><body><h1>Request Parameters</h1><ul>"
-                for key, val in pairs(args) do
-                    if type(val) == "table" then
-                        response = response .. "<li>" .. key .. " : " .. table.concat(val, ", ") .. "</li>"
-                    else
-                        response = response .. "<li>" .. key .. " : " .. val .. "</li>"
-                    end
+                local param = args["type"]
+                local file = ""
+                if param == "preflight" then
+                    file = io.open("${NGINX_PF_CORS_CONFIG_FILE}", "w+b")
+                else
+                    file = io.open("${NGINX_CORS_CONFIG_FILE}", "w+b")
                 end
-                response = response .. "</ul></body></html>"
-                ngx.say(response)
-            }
+                ngx.header["Access-Control-Allow-Origin"] = "*"
+                ngx.req.read_body()
+                local request_body = ngx.req.get_body_data()  
+                file:write(request_body)
+                file:close()
+            ';
         }
 
 
-        # POST login
-        # TBD probably return JSON in future??
-        location /login {
-            if ($request_method = OPTIONS) {
-                add_header 'Access-Control-Allow-Origin' '*';
-                add_header 'Access-Control-Allow-Methods' 'GET, POST, OPTIONS';
-                add_header 'Access-Control-Allow-Headers' 'DNT,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range';
-                add_header 'Access-Control-Max-Age' 1728000;
-                add_header 'Content-Type' 'text/plain; charset=utf-8';
-                add_header 'Content-Length' 0;
-                return 204;
-            }
-        }
+        
 
     

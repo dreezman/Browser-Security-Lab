@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Image</title>
+</head>
+<body>
+    <h3>Import Image</h3>
+    <label for="server-select">Choose a server:</label>
+    <select id="server-select">
+        <option value="HTMLFrontend">Make a Same origin request for an image</option>
+        <option value="CORSbackend">Make a CORS request for an image</option>        
+    </select>
+    <button id="fetch-image">Fetch Image</button>
+    <br /><br />
+    <img id="image-display" alt="Fetched Image" style="display:none;"/>
+    <br />
+    <hr>
+The image below was hardcoded into the HTML with a CORS src=https://localhost:9443/get-img/cors/hackerimg.png and so a CORS
+request is allowed to be displayed. So why did the same fetch() request above fail to display the image when you clicked the button ?
+    <br />
+    <img id="image-display-direct" src="https://localhost:9443/get-img/cors/hackerimg.png" alt="Fetched Image" />
+        <br /><br />
+
+
+    <script src="../getConfig.js" type="application/javascript"></script>
+    <script>
+        // Assuming getConfig function sets the jsonConfig object
+        getConfig("../config.json"); // data is stored in localstorage under "config"
+        const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
+
+        document.getElementById('fetch-image').addEventListener('click', function() {
+            const selectedServer = document.getElementById('server-select').value;
+            const serverURL = jsonConfig[selectedServer].fullHTTPSURL;
+            const imageUrl = serverURL + "/get-img/cors/hackerimg.png";
+
+            fetch(imageUrl,
+            {
+                method: "GET", 
+                contentType: "image/png"
+                        })  
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    const imgElement = document.getElementById('image-display');
+                    imgElement.src = imageUrl;
+                    imgElement.style.display = 'block';
+                })
+                .catch(error => {
+                    const imgElement = document.getElementById('image-display');
+                    imgElement.src = null;
+                    console.error('Error fetching image:', error);
+
+                });
+        });
+    </script>
+</body>
+</html>

@@ -36,7 +36,7 @@ Javascript as Executable Code:
    document.getElementsByTagName('*')
 
 3. Paste this into your browser's address bar:
-   http://localhost:9081/xss-attack?xssvalue=HelloWorld
+   https://localhost:8443/xss-attack?xssvalue=HelloWorld
 
 
 4. Paste this into your browser's debug console:
@@ -49,7 +49,7 @@ Javascript as Executable Code:
 
 
 6. Paste this into your browser's address bar:
-   http://localhost:9081/xss-attack?xssvalue=<script>alert("XSS attack 1")</script>
+   https://localhost:8443/xss-attack?xssvalue=<script>alert("XSS attack 1")</script>
 
 7. Paste this into your browser's debug console:
     document.getElementsByTagName('*')
@@ -79,7 +79,7 @@ Javascript as Text
 
 12. Paste this into your browser's address bar:
 
-http://localhost:9081/xss-attack?xssvalue=' <script>  alert('XSS attack 2') </script>'
+https://localhost:8443/xss-attack?xssvalue=' <script>  alert('XSS attack 2') </script>'
 
 13. In the console, see how the code above is stored as text in the DOM:
 

@@ -4,7 +4,7 @@
 
 <h2>HTML Forms</h2>
 
-<form action="http://localhost:9081/xss-form">
+<form action="https://localhost:8443/xss-form" method="POST">
   <label for="fname">First name:</label><br>
   <input type="text" id="fname" name="fname" value="John"><br>
   <label for="lname">Last name:</label><br>
@@ -15,7 +15,7 @@
 <p>If you click the "Submit" button, the form-data will be sent to a page called "/action_page.php".</p>
 
 <textarea rows="20" cols="150">
-    <form action="http://localhost:9081/xss-form">
+    <form action="https://localhost:8443/xss-form">
         <label for="fname">First name:</label><br>
         <input type="text" id="fname" name="fname" value="John"><br>
         <label for="lname">Last name:</label><br>

@@ -29,18 +29,34 @@
         add_header Access-Control-Allow-Origin "*";
         ## pull in policy from shared volume with new config submitted
         ## by user and updated every 5 seconds
-        include ${NGINX_CONFIG_FILE};
         try_files $uri $uri/ /index.html;
     }
 
+	# Part of class training, no csp policy
+	location ~ ^/(xss|csp)/ {
+        # no caching
+        add_header Last-Modified $date_gmt;
+        add_header Cache-Control 'no-store, no-cache';
+        add_header Access-Control-Allow-Origin "*";
+        include $NGINX_CSP_CONFIG_FILE;
+            try_files $uri $uri/ /index.html;
+	}
 
 
 	# Part of class training, no csp policy
-	location /csp/ {
-    # no caching
-    add_header Last-Modified $date_gmt;
-    add_header Cache-Control 'no-store, no-cache';
-    add_header Access-Control-Allow-Origin "*";
-		try_files $uri $uri/ /index.html;
+	location ~ ^/(cors|csrf)/ {
+        # no caching
+        add_header Last-Modified $date_gmt;
+        add_header Cache-Control 'no-store, no-cache';
+        add_header Access-Control-Allow-Origin "*";
+            try_files $uri $uri/ /index.html;
 	}
 
+    #### This is used to duplicate endpoints that
+    #### Normally occur in the CORS backend because
+    #### the front-end is at port 7443, and CORS testing
+    #### will test Cross Origin requests, from 7443 to 9443 (CORS backend)
+    #### as well as 7443 to 7443 this server with duplicate endpoints
+    #### which is NOT a Cross Origin call to prove that no CORs headers
+    #### are required.
+    include /etc/nginx/conf.d/cors-be.conf;

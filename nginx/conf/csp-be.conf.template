@@ -1,0 +1,74 @@
+# backend api server written in LUA that simulates backend API endpoints
+
+        # default is hello world
+        location / {
+            include $NGINX_CSP_CONFIG_FILE;
+            default_type text/html;
+            content_by_lua_block {
+                ngx.header["Access-Control-Allow-Origin"] = '*'
+                ngx.say("<p>hello, world to default location</p>")
+            }
+        }
+ 
+        # return HTML using content from request params...also XSS vulnerable
+        #   https://localhost:8443/xss-attack?xssvalue='<script>  alert("XSS attack 2") </script>'
+        location /xss-attack {
+            include $NGINX_CSP_CONFIG_FILE;
+            content_by_lua_block {
+                ngx.header["Access-Control-Allow-Origin"] = "*"
+                local args = ngx.req.get_uri_args()
+                local xssvalue = args["xssvalue"]
+                -- Check if the value begins and ends with single or double quotes
+                -- see https://www.lua.org/manual/5.1/manual.html#5.4.1
+                -- Return HTML if NOT quoted, else return text
+                if not xssvalue:match("^['\"].+['\"]$") then
+                    -- return HTML because probably some script
+                    ngx.header["Content-Type"] = "text/html"
+                else
+                    -- quoted text
+                    ngx.header["Content-Type"] = "text/plain"
+                end
+                ngx.say(xssvalue)
+            }
+        }
+
+        # return HTML of the form
+        #   https://localhost:8443/xss-attack?xssvalue='<script>  alert("XSS attack 2") </script>'
+        location /xss-form {
+            include $NGINX_CSP_CONFIG_FILE;
+            content_by_lua_block {
+            ngx.header["Content-Type"] = "text/html"
+            ngx.header["Access-Control-Allow-Origin"] = "*"
+            -- Read the request body
+            ngx.req.read_body()
+            -- Retrieve the form parameters
+            local args = ngx.req.get_post_args()
+            -- Get the fname and lname parameters
+            local fname = args["fname"]
+            local lname = args["lname"]        
+            -- Create the response
+            local response = "<html><body><h1>Form Submission</h1><p>First Name: " .. fname .. "</p><p>Last Name: " .. lname .. "</p></body></html>"
+            
+            -- Send the response
+            ngx.say(response)
+    
+            }
+        }
+
+
+
+        ############  Update CSP ngixn configuration dynamically  ############
+        # allow browser client to update nginx config dynamically
+        # cron has reload every 5 seconds to reload nginx config
+        # dynmically update the CSP config file
+        location /push-ngx-config {
+            content_by_lua '
+                local file = io.open("${NGINX_CSP_CONFIG_FILE}", "w+b")
+                ngx.header["Access-Control-Allow-Origin"] = "*"
+                ngx.req.read_body()
+                local request_body = ngx.req.get_body_data()  
+                file:write(request_body)
+                file:close()
+            ';
+        }
+    

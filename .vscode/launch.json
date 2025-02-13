@@ -31,7 +31,7 @@
       "name": "Debug Lab FrontEnd",
       "type": "chrome",
       "request": "launch",
-      "url": "http://localhost:9081/iframes.html",
+      "url": "https://localhost:8443/iframes.html",
       "webRoot": "${workspaceFolder}"
     }
     {
