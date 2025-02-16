@@ -6,55 +6,81 @@
     <title>Get Image</title>
 </head>
 <body>
+    <script src="../common.js" type="application/javascript"></script>
     <h3>Import Image</h3>
     <label for="server-select">Choose a server:</label>
     <select id="server-select">
-        <option value="HTMLFrontend">Make a Same origin request for an image</option>
-        <option value="CORSbackend">Make a CORS request for an image</option>        
+        <option value="CORSbackend">CORS Backend</option>
+        <option value="HTMLFrontend">HTML Frontend</option>
     </select>
     <button id="fetch-image">Fetch Image</button>
     <br /><br />
+    <div id="text-display" style="display:none;"></div>
     <img id="image-display" alt="Fetched Image" style="display:none;"/>
-    <br />
     <hr>
-The image below was hardcoded into the HTML with a CORS src=https://localhost:9443/get-img/cors/hackerimg.png and so a CORS
-request is allowed to be displayed. So why did the same fetch() request above fail to display the image when you clicked the button ?
-    <br />
-    <img id="image-display-direct" src="https://localhost:9443/get-img/cors/hackerimg.png" alt="Fetched Image" />
-        <br /><br />
-
-
-    <script src="/common.js"  type="application/javascript"></script>
+    <div id="static-text-display" style="display:block;">
+        <hr><p> 
+            The image below is fetched from a different server as the base HTML file. 
+            **BUT** it was NOT set with a JS fetch, but statically inside the HTML. 
+            Look at the source HTML to see how it was set. Notice, no COPs errors. Why?
+    </div>
+    <img id="static-image-display" style="display:none;">    </img>
     <script>
+        // Set the static image URL which is NOT same as the base HTML server
+        // for static cross origin image fetch, but result of a direct fetch
+        // but set statically in the HTML file
+        const serverURL = jsonConfig["CORSbackend"].fullHTTPSURL;
+        const staticImageUrl = serverURL + "/get-img-file/cors/hackerimg.png";
+        const staticImgElement = document.getElementById('static-image-display');
+        staticImgElement.src = staticImageUrl;
+        staticImgElement.style.display = 'block';
+    </script>
 
+
+
+    <script>
+        // Add event listener to the fetch image button for either
+        // same or cross origin image fetch
         document.getElementById('fetch-image').addEventListener('click', function() {
             const selectedServer = document.getElementById('server-select').value;
             const serverURL = jsonConfig[selectedServer].fullHTTPSURL;
-            const imageUrl = serverURL + "/get-img/cors/hackerimg.png";
+            const imageUrl = serverURL + "/get-img-file/cors/hackerimg.png";
+            const imgElement = document.getElementById('image-display');
+            const textElement = document.getElementById('text-display');
+                  textElement.style.display = 'block';
+                  if (selectedServer == "HTMLFrontend") {
+                      textElement.innerHTML = "<p>The image below is fetched from the same server as the base HTML file.<hr>";
+                  }
+                  else {
+                    textElement.innerHTML = "<P>The image below is fetched from a different server as the base HTML file.<hr>";
+                  }
+                  textElement.innerHTML +=  "<p> HTML Server : " + document.location.origin;
+                  textElement.innerHTML +=  "<P> Image Server: " + serverURL;                  
+            // Revoke the previous blob URL if it exists
+            if (imgElement.src) {
+                URL.revokeObjectURL(imgElement.src);
+                imgElement.src = '';
+            }
 
-            fetch(imageUrl,
-            {
-                method: "GET", 
-                contentType: "image/png"
-                        })  
+            // Fetch the image
+            fetch(imageUrl)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok');
                     }
-                    return response.text();
+                    return response.blob();
                 })
-                .then(html => {
-                    const imgElement = document.getElementById('image-display');
-                    imgElement.src = imageUrl;
+                .then(blob => {
+                    imgElement.src = URL.createObjectURL(blob);
                     imgElement.style.display = 'block';
                 })
                 .catch(error => {
-                    const imgElement = document.getElementById('image-display');
-                    imgElement.src = null;
+                    textElement.innerHTML += '<p style="color: red; font-size: 20px;">Cannot Fetch IMAGE data, check console for error</p>';;
                     console.error('Error fetching image:', error);
-
                 });
+
         });
+
     </script>
 </body>
 </html>
