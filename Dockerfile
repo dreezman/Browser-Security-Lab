@@ -3,9 +3,11 @@ FROM openresty/openresty:1.25.3.1-2-alpine-fat
 ARG NGINX_CSP_CONFIG_FILE
 ARG NGINX_PF_CORS_CONFIG_FILE
 ARG NGINX_CORS_CONFIG_FILE
+ARG NGINX_CSRF_CONFIG_FILE
 ENV NGINX_CSP_CONFIG_FILE=${NGINX_CSP_CONFIG_FILE} \
     NGINX_PF_CORS_CONFIG_FILE=${NGINX_PF_CORS_CONFIG_FILE} \
-    NGINX_CORS_CONFIG_FILE=${NGINX_CORS_CONFIG_FILE} 
+    NGINX_CORS_CONFIG_FILE=${NGINX_CORS_CONFIG_FILE} \
+    NGINX_CSRF_CONFIG_FILE=${NGINX_CSRF_CONFIG_FILE} 
 RUN apk update && apk add --no-cache \
     openrc \
     curl \
@@ -38,6 +40,7 @@ RUN bash -c ' \
         "${NGINX_CSP_CONFIG_FILE}" \
         "${NGINX_PF_CORS_CONFIG_FILE}" \
         "${NGINX_CORS_CONFIG_FILE}" \
+        "${NGINX_CSRF_CONFIG_FILE}" \
     ); \
     echo "#!/bin/sh" > /docker-entrypoint.d/10-clear-csp-policy.sh; \
     for CONFIG_FILE in "${CONFIG_FILES[@]}"; do \

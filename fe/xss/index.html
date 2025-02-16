@@ -15,11 +15,8 @@
             </head>
         <body>
             <!-- Get URLs of all the front end back ends </script> -->
-            <script src="../getConfig.js" type="application/javascript"></script>
-            <script>
-            getConfig("../config.json"); // data is stored in localstorage under "config"
-            const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
-            </script>
+            <script src="/common.js"  type="application/javascript"></script>
+
             <div class="column-split">
                 <h1>XSS Lab</h1>
                 <p>This page shows different forms of XSS to steal cookies</p>

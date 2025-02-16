@@ -14,6 +14,8 @@ services:
         # this is for cors preflight requests
         NGINX_CORS_CONFIG_FILE: /usr/share/nginx-config/ngx-dynamic-cors-update-file.conf
         NGINX_PF_CORS_CONFIG_FILE: /usr/share/nginx-config/ngx-dynamic-preflight-cors-update-file.conf
+      # this is for CSRF
+        NGINX_CSRF_CONFIG_FILE: /usr/share/nginx-config/ngx-dynamic-csrf-update-file.conf
     volumes:
       - ./nginx/local:/usr/share/nginx-config:rw
       - ./nginx/conf:/etc/nginx/templates
@@ -29,9 +31,10 @@ services:
       - "7443:443"   # bsl ssl front end HTML and JS server
       - "8000:8000"  # csp backend
       - "8443:8443"  # csp ssl backend
-      - "9000:9000" #  cors backend
-      - "9443:9443" #  cors ssl backend
-
+      - "9000:9000"  #  cors backend
+      - "9443:9443"  #  cors ssl backend
+      - "10000:10000" #  csrf backend
+      - "10443:10443" #  csrf ssl backend
 
   ################# CSP REPORTER ####################
   # where to send the csp reports

@@ -24,6 +24,7 @@
         ## send logs to here
         add_header Reporting-Endpoints  $NGX_CSP_REPORTING_SERVER;
         # no caching
+        add_header Server "ngx-default";
         add_header Last-Modified $date_gmt;
         add_header Cache-Control 'no-store, no-cache';
         add_header Access-Control-Allow-Origin "*";
@@ -43,10 +44,12 @@
 	}
 
 
-	# Part of class training, no csp policy
-	location ~ ^/(cors|csrf)/ {
+	# Part of class training, no csp policy for front end
+    # pages
+	location ~ ^/(cors|csrf|xss/index.html|common.js)/ {
         # no caching
         add_header Last-Modified $date_gmt;
+        add_header Server ngx-csp1;
         add_header Cache-Control 'no-store, no-cache';
         add_header Access-Control-Allow-Origin "*";
             try_files $uri $uri/ /index.html;

@@ -67,6 +67,10 @@
                 ngx.header["Access-Control-Allow-Origin"] = "*"
                 ngx.req.read_body()
                 local request_body = ngx.req.get_body_data()  
+                -- cannot write a NIL
+                if request_body == nil then
+                    request_body = " "
+                end
                 file:write(request_body)
                 file:close()
             ';

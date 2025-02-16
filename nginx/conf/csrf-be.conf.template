@@ -1,0 +1,36 @@
+# backend api server written in LUA that simulates backend API endpoints
+
+
+
+        # GET to return JSON data
+        # default return a json string
+        location / {
+            charset       utf-8;
+            content_type  text/html;
+            content_by_lua '
+                ngx.status  = ngx.HTTP_OK
+                ngx.say("CSRF TBD")
+                return ngx.exit(ngx.HTTP_OK)
+            ';
+        }
+
+
+
+        ############  Update CSRF ngixn configuration dynamically  ############
+        # allow browser client to update nginx config dynamically
+        # cron has reload every 5 seconds to reload nginx config
+        # dynmically update the CSRF config file
+        location /push-ngx-config {
+            content_by_lua '
+                local file = io.open("${NGINX_CSRF_CONFIG_FILE}", "w+b")
+                ngx.header["Access-Control-Allow-Origin"] = "*"
+                ngx.req.read_body()
+                local request_body = ngx.req.get_body_data()  
+                -- cannot write a NIL
+                if request_body == nil then
+                    request_body = " "
+                end
+                file:write(request_body)
+                file:close()
+            ';
+        }    

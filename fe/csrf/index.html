@@ -8,11 +8,8 @@
     <!----------------------------------------------------------------------------------------
       Load Config information about iframes and their URLs and ports
     ------------------->
-    <script src="../getConfig.js" type="application/javascript"></script>
-    <script>
-      getConfig("../config.json"); // data is stored in localstorage under "config"
-      const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
-    </script>
+    <script src="/common.js"  type="application/javascript"></script>
+
     <!-- -------------------------------------------------------------------------------------------- -->
     <!-- -------------------------------------------------------------------------------------------- -->
     <!--      Cookie Testing-   Load up on Cookies                                          -->
@@ -32,9 +29,9 @@
     2) Clear out network traffic <br />
     3) Clear out cookies <br />
     4) Monitor network and cookie jar and see what happens <br /><br />
-    <img src="bakingcookies.jpg" alt="bakecookies" width="400" height="200" />
+    <img src="/csrf/bakingcookies.jpg" alt="bakecookies" width="400" height="200" />
     <br />
-    <script src="getCookies.js"></script>
+    <script src="/csrf/getCookies.js"></script>
     <button
       type="button"
       id="getvariouscookiessameorigin"
@@ -86,7 +83,7 @@
     automatically by the main browser on HTTP requests. Let' look into the
     cookie storage and describe the security fields which tell them main browser
     when to send the cookie<br />
-    <img src="cookiestorage.jpg" alt="Cookie Jar" width="800" height="200" />
+    <img src="/csrf/cookiestorage.jpg" alt="Cookie Jar" width="800" height="200" />
     <ul>
       <li>
         Domain - Which site (ignore port,subdomains) should I send this to. If
@@ -150,7 +147,7 @@
     <p>Click the picture to steal a cookie</p>
     <a id="attacklink">
       <img
-        src="cookiemonster.jpg"
+        src="/csrf/cookiemonster.jpg"
         alt="Cookie Monster"
         width="400"
         height="200" /></a

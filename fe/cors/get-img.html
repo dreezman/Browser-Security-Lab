@@ -24,11 +24,8 @@ request is allowed to be displayed. So why did the same fetch() request above fa
         <br /><br />
 
 
-    <script src="../getConfig.js" type="application/javascript"></script>
+    <script src="/common.js"  type="application/javascript"></script>
     <script>
-        // Assuming getConfig function sets the jsonConfig object
-        getConfig("../config.json"); // data is stored in localstorage under "config"
-        const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
 
         document.getElementById('fetch-image').addEventListener('click', function() {
             const selectedServer = document.getElementById('server-select').value;

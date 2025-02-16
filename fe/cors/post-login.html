@@ -16,11 +16,8 @@
     <br /><br />
     <div id="html-output"></div>
 
-    <script src="../getConfig.js" type="application/javascript"></script>
+    <script src="/common.js"  type="application/javascript"></script>
     <script>
-        // Assuming getConfig function sets the jsonConfig object
-        getConfig("../config.json"); // data is stored in localstorage under "config"
-        const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
 
         document.getElementById('login-request').addEventListener('click', function() {
             const selectedServer = document.getElementById('server-select').value;

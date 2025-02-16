@@ -98,4 +98,34 @@ http {
         }
     }   
 
+
+       ############   back end CSRF configurations HTTP server ############
+    server {
+        listen 10000;
+        server_name localhost;
+        return 301 https://$host:10443$request_uri;
+    }
+    server {
+        listen              10443 ssl;
+        ssl_protocols TLSv1.2 TLSv1.3;
+        server_name         localhost;
+        include             mime.types;
+        root                /usr/local/openresty/nginx/html/;
+
+        ssl_certificate     /usr/local/openresty/nginx/publiccert.crt;
+        ssl_certificate_key /usr/local/openresty/nginx/privatekey.key;
+
+
+        include /etc/nginx/conf.d/cors-be.conf;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+    }   
+
+
+
 }

@@ -46,11 +46,8 @@
 
     <div class="form-container-split">
       <!-- Get URLs of all the front end back ends </script> -->
-      <script src="../getConfig.js" type="application/javascript"></script>
-      <script>
-        getConfig("../config.json"); // data is stored in localstorage under "config"
-        const jsonConfig = JSON.parse(localStorage.getItem("apiConfig"));
-      </script>
+      <script src="/common.js"  type="application/javascript"></script>
+
       <h2>Submit CORS Form</h2>
       <form id="configForm" enctype="text/plain">
         <label for="configInput">Enter Config:</label>
