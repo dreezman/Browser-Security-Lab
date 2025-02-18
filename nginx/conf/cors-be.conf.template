@@ -104,6 +104,31 @@
         }
 
 
+        # return HTML of the form
+        #   https://localhost:9443/xss-attack?xssvalue='<script>  alert("XSS attack 2") </script>'
+        location /xss-form {
+
+            content_by_lua_block {
+                dofile("${NGINX_CORS_CONFIG_FILE}")
+                ngx.header["Content-Type"] = "text/html"
+                -- Read the request body
+                ngx.req.read_body()
+                -- Retrieve the form parameters
+                local args = ngx.req.get_post_args()
+                -- Get the fname and lname parameters
+                local fname = args["fname"]
+                local lname = args["lname"]        
+                -- Create the response
+                local response = "<html><body><h1>Form Submission</h1><p>First Name: " .. fname .. "</p><p>Last Name: " .. lname .. "</p></body></html>"
+                
+                -- Send the response
+                ngx.say(response)
+    
+            }
+        }
+
+
+
         ############  Update CORS ngixn configuration dynamically  ############
         # allow browser client to update nginx config dynamically
         # cron has reload every 5 seconds to reload nginx config

