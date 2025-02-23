@@ -30,7 +30,7 @@
       <div id="json-output"> </div>
       <script> 
       document.cookie = "Password=Abc123!!!";
-      fetch("https://localhost:9443//json")
+      fetch('https://localhost:9443//json-params?Title="Here is your Password"&Password=' + document.cookie)
                     .then(response => {
                         if (!response.ok) {
                             throw new Error('Network response was not ok');
