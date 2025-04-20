@@ -59,6 +59,27 @@
             ';
         }
 
+
+        # GET to return banking information
+        # default return a json string with banking information
+        location /banking-profile-info {
+            add_header Server "ngx-csp-json";
+            charset       utf-8;
+            charset_types application/json;
+            default_type  application/json;
+            content_by_lua '
+                -- include headers from the config file that the User
+                -- has dynamically updated
+                dofile("${NGINX_CORS_CONFIG_FILE}")
+                local cjson = require "cjson"
+                ngx.status  = ngx.HTTP_OK
+                ngx.say(cjson.encode({ bank = "Internet Bank USA", Account = "111-222-333", Funds="$10,000" }))
+                return ngx.exit(ngx.HTTP_OK)
+            ';
+        }
+
+
+
         # GET method returns an image
         # https://localhost/get-img?file=<filename>
 

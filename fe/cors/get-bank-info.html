@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Bank Information</title>
+</head>
+    <body>
+        <h3>Get Banking Information</h3>
+        <label for="server-select">Choose a server:</label>
+        <select id="server-select">
+            <option value="HTMLFrontend">Make a Same origin request for JSON data</option>
+            <option value="CORSbackend">Make a CORS request for JSON data</option>        
+        </select>
+        <button id="fetch-json">Fetch Banking Info</button>
+        <br /><br />
+        <div id="json-output"></div>
+    
+        <script src="/common.js"  type="application/javascript"></script>
+        <script>
+
+            document.getElementById('fetch-json').addEventListener('click', function() {
+                const selectedServer = document.getElementById('server-select').value;
+                const serverURL = jsonConfig[selectedServer].fullHTTPSURL;
+                const jsonUrl = serverURL + "/banking-profile-info";
+
+                const jsonOutput = document.getElementById('json-output');
+                  jsonOutput.style.display = 'block';
+                  if (selectedServer == "HTMLFrontend") {
+                      jsonOutput.innerHTML = "<p>The JSON below is fetched from the same server as the base HTML file.<hr>";
+                  }
+                  else {
+                    jsonOutput.innerHTML = "<P>The JSON below is fetched from a different server as the base HTML file.<hr>";
+                  }
+                  jsonOutput.innerHTML +=  "<p> HTML Server : " + document.location.origin;
+                  jsonOutput.innerHTML +=  "<P> JSON Server: " + serverURL;    
+
+
+
+                fetch(jsonUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(json => {
+                    const jsonOutput = document.getElementById('json-output');
+                    jsonOutput.innerHTML += `<pre>${JSON.stringify(json, null, 2)}</pre>`;
+                })
+                .catch(error => {
+
+                    jsonOutput.innerHTML = '<p style="color: red; font-size: 20px;">Cannot Fetch Banking data, check console for error</p>';
+                    console.error('Error fetching Banking data:', error);
+                });
+            });
+        </script>
+    </body>
+</html>
