@@ -54,6 +54,8 @@ RUN bash -c ' \
     # copy front end static files to the web root
 COPY fe/ /usr/local/openresty/nginx/html/
 # install luafilesystem which allow LUA to make file
-# system calls like chdir, mode, default dir
-RUN  luarocks install luafilesystem
+# system calls like chdir, mode, default dir. and JWT
+# for token validation
+RUN  luarocks install luafilesystem 
+RUN  luarocks install  lua-resty-jwt
 CMD ["/docker-entrypoint.sh", "nginx"]

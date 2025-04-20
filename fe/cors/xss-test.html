@@ -42,19 +42,8 @@
                 })
             .then(data => {
 
-                // Parse the JSON string
-                const parsedData = JSON.parse(data);
-                const username = parsedData.username;
-                const token = parsedData.token;
-
-                // Display the parsed data
-                loginOutput.innerHTML = '<pre style="font-size: 14px"> Got successful response from login. Here is your that will be stored in cookeis and local storage:<br>';
-                loginOutput.innerHTML += "Username:"  +  username + "<br>";
-                loginOutput.innerHTML += "Token: "+ token + "</pre>";
-                document.cookie = "name=" + username + ";";
-                document.cookie = "token=" + token + ";";
-                localStorage.setItem("username", username);
-                localStorage.setItem("token", token);
+              loginOutput.innerHTML = `<pre> Got successful response from login. Here is your token: <br>`;
+              loginOutput.innerHTML +=` ${JSON.stringify(data, null, 2)} </pre>`;
             })
 
             .catch(error => {

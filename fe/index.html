@@ -8,7 +8,12 @@
     </head>
     <body>
         <h2>Browser Security Lab</h2>
-
+        <script>
+            document.cookie = "Password=secretPassword";
+            document.cookie = "Username=JohnDoe-Cookie";
+            sessionStorage.setItem("Password", "secretPassword");
+            sessionStorage.setItem("Username", "JohnDoe-SessionStorage");
+        </script>
         <img src=/Logo-smaller.gif width="15%">
         <p>Click on the tabs to switch between different security topics.</p>
 

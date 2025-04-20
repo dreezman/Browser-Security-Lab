@@ -2,7 +2,7 @@
 
         # This might be the backend, but also return any any JS files 
         # that are requested
-        location ~ /*\.js {
+        location ~ /*.js {
 
             add_header Last-Modified $date_gmt;
             add_header Cache-Control 'no-store, no-cache';
@@ -59,6 +59,7 @@
             ';
         }
 
+
         # GET method returns an image
         # https://localhost/get-img?file=<filename>
 
@@ -102,6 +103,8 @@
         location /login {
             add_header Server "ngx-csp-login";
             content_by_lua_block {
+                local cjson = require "cjson"
+                local jwt = require "resty.jwt"                
                 local method = ngx.req.get_method()
 
                 if method == "OPTIONS" then
@@ -137,12 +140,10 @@
                     ngx.log(ngx.STDERR, 'Login Successfull, adding header')
                     dofile("${NGINX_CORS_CONFIG_FILE}")
 
-                    local cjson = require "cjson"
-                    local jwt = require "resty.jwt"
 
+                    -- Generate a JWT token
                     local jwt_token = jwt:sign(
-
-                        "1234567890", -- Replace with your actual secret key
+                        "your_secret_key", -- Replace with your actual secret key
                         {
                             header = { typ = "JWT", alg = "HS256" },
                             payload = { username = name }
@@ -156,10 +157,22 @@
                     }
 
                     -- Send the JSON response
-
-                    ngx.header["Content-Type"] = "application/json"
                     ngx.say(cjson.encode(response))
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    ngx.say("Login succesfull with Name: " .. name .. ", Password: " .. password)
                 else
                     ngx.status = ngx.HTTP_BAD_REQUEST
                     ngx.say("Unsupported request method")
