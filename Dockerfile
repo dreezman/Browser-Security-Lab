@@ -8,13 +8,16 @@ ENV NGINX_CSP_CONFIG_FILE=${NGINX_CSP_CONFIG_FILE} \
     NGINX_PF_CORS_CONFIG_FILE=${NGINX_PF_CORS_CONFIG_FILE} \
     NGINX_CORS_CONFIG_FILE=${NGINX_CORS_CONFIG_FILE} \
     NGINX_CSRF_CONFIG_FILE=${NGINX_CSRF_CONFIG_FILE} 
-RUN apk update && apk add --no-cache \
-    openrc \
-    curl \
-      bash \
-      net-tools \
-      tcpdump \
-      vim
+
+
+# bit convulated but this is the only way to get luarocks installed
+RUN apk update && apk add openrc build-base curl bash unzip net-tools tcpdump vim readline-dev luajit-dev luajit make && \
+      curl -LO https://luarocks.org/releases/luarocks-3.12.2.tar.gz && tar zxvf luarocks-3.12.2.tar.gz && \
+      curl -LO https://luarocks.org/releases/luarocks-3.12.2.tar.gz && tar zxvf luarocks-3.12.2.tar.gz && \
+      cd luarocks-3.12.2 && ./configure   --with-lua-include=/usr/include/luajit-2.1 --lua-suffix=jit --lua-version=5.1 --with-lua-interpreter=luajit && make && make install && \
+      luarocks --version -- 3.12.2 && \
+      sed -i '/WGET/d' /usr/local/share/lua/5.1/luarocks/fs/tools.lua && \
+      luarocks install lua-resty-iputils      
 
 LABEL "org.opencontainers.image.vendor"="Layer8"
 LABEL "org.opencontainers.image.title"="Browser Security Training"

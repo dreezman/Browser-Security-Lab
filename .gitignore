@@ -10,3 +10,4 @@ node_modules/**
 !Docker*
 
 static/cors/index copy.html
+nginx/local/ngx-csp-update-file.conf
